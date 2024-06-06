@@ -1,0 +1,10 @@
+packaging
+requests
+pyside6
+firebase-admin 
+requests
+opcua
+weasyprint
+python-dateutil
+pyinstaller
+pycomm3
