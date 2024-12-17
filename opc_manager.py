@@ -4,19 +4,17 @@ from PySide6.QtCore import QObject, Signal
 from opcua import Client, ua
 from threading import Thread
 from datetime import datetime
-from utilidad_general import UtilidadGeneral
 
 
 class OpcManager(QObject):
     data_changed = Signal(str, object)
-    def __init__(self, opc_url):
+    def __init__(self, opc_url, opc_addresses_subcription: dict, actualizar_productos_addresses):
         super().__init__()
         self.url = opc_url
         self.client = Client(self.url)
-        self.opc_addresses = UtilidadGeneral.datos_compartidos["opc_addresses"]
-    
         self.subscriptions = []
-        self.opc_addresses_subcription = UtilidadGeneral.datos_compartidos["opc_addresses_subcription"]
+        self.opc_addresses_subcription = opc_addresses_subcription
+        self.actualizar_productos_addresses = actualizar_productos_addresses
         self.handler = SubHandler(self)
       
 
@@ -26,9 +24,8 @@ class OpcManager(QObject):
         self.opc_addresses_subcription = opc_addresses_subcription
         self.error_name = error_name
         
-        
-
     def init_opcua(self):
+        print("🚀 ~ init_opcua:")
         self.connecter_to_opcua()
         # Iniciar el monitoreo de conexión en un hilo separado
         thread = Thread(target=self.start_monitoring)
@@ -46,8 +43,8 @@ class OpcManager(QObject):
             try:
                 # Intenta leer un nodo específico como señal de vida
                 # Elige un nodo que sepas que siempre debería estar disponible
-                # print("Revisando la disponibilidad de OPC UA...")
-                val = self.client.get_node(self.opc_addresses['actualizar_productos']).get_value()
+                print("Revisando la disponibilidad de OPC UA...")
+                val = self.client.get_node(self.actualizar_productos_addresses).get_value()
             except Exception as e:
                 print("Conexión perdida. Intentando reconectar...")
                 self.reconnected_to_opcua()

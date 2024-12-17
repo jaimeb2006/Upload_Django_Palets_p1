@@ -4,8 +4,6 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QLabel, QGridLayout, QPushButton,
                                QVBoxLayout, QHBoxLayout, QPushButton,QStackedWidget, QFrame, 
                                QGroupBox,  QSpacerItem, QSizePolicy, QLineEdit)
-from django_manager import DjangoManager
-from opc_manager import OpcManager
 from PySide6.QtCore import Qt
 
 from orden_produccion import OrdenProduccion
@@ -15,26 +13,13 @@ from utilidad_general import UtilidadGeneral
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
-    
-        printers_info = [
-            (f'Linea 1', 0,0,0,0,'Error'),
-            (f'Linea 2', 0,0,0,0,'Error'),
-            (f'Linea 3', 0,0,0,0,'Error'),
-            (f'Linea 4', 0,0,0,0,'Error'),
-            (f'Linea 5', 0,0,0,0,'Error'),
-        ]
-        self.setWindowTitle(f'Sinconizacion en cargar palets a Django')
-        #Cambiar de 0, 400, 800
-       
-        self.setGeometry(0, 30, 900, 250)
-         # Información de las impresoras
-        # self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
-        self.opc_url="opc.tcp://192.168.100.112:49320"
-        self.django_manager = DjangoManager()
-        self.opc_manager = OpcManager(opc_url=self.opc_url)
-        UtilidadGeneral.inicializar_managers(self.django_manager, self.opc_manager)       
-        UtilidadGeneral.suscribir(self)
+        self.utilidad_general = UtilidadGeneral()
+        self.linea = self.utilidad_general.linea
+        printer_info = (f'Línea {self.linea}', 0, 0, 0, 0)
+        self.setWindowTitle(f'Sin L{self.linea}')
+        posicion_x = ((self.linea)-1)*250
+        self.setGeometry(posicion_x, 0, 250, 200)
+        self.utilidad_general.suscribir(self)
 
         # Widget central y layout principal
         central_widget = QWidget()
@@ -42,154 +27,72 @@ class MainWindow(QMainWindow):
         main_layout = QHBoxLayout(central_widget)
         main_layout.setContentsMargins(10, 20, 10, 10)
 
-        self.printer_widgets = {}  # Diccionario para mantener las referencias
+        # Contenedor para la información de la línea
         printers_container = QFrame()
-        printers_layout = QGridLayout()  # Usamos QGridLayout
-        
+        printers_layout = QGridLayout()
 
-        # Ancho fijo para la sección de impresoras
-        # printers_container.setFixedWidth(self.width-50)  
+        # Desempaquetar la información de una sola línea
+        name, orden, contador, turno, trigger = printer_info
 
-        numero_de_columnas = 3
+        # Crear un QGroupBox con la información de la línea
+        group_box = QGroupBox(name)
+        group_box.setStyleSheet("""
+            QGroupBox {
+                font-size: 14pt;
+                color: #000080;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 3px 0 3px;
+                background-color: rgb(240, 240, 240);
+            }
+        """)
 
-        for index, (name, orden, contador, turno, tigger, status) in enumerate(printers_info):
-            fila = index // numero_de_columnas
-            columna = index % numero_de_columnas
-         
-        # for name, orden, contador, turno, tigger in printers_info:
-            group_box = QGroupBox(name)
-            group_box.setStyleSheet("""
-                QGroupBox {
-                    font-size: 14pt; /* Tamaño de la fuente del título */
-                    color: #000080; /* Color del texto del título */
-                }
-                QGroupBox::title {
-                    subcontrol-origin: margin;
-                    left: 10px; /* Desplazamiento a la izquierda del título */
-                    padding: 0 3px 0 3px; /* Padding alrededor del texto: arriba derecha abajo izquierda */
-                    background-color: rgb(240, 240, 240); /* Ajusta esto al color de fondo de tu ventana o widget */
-                }
-            """)
+        group_layout = QVBoxLayout(group_box)
+        group_layout.setSpacing(5)
 
-            group_layout = QVBoxLayout(group_box)
-            group_layout.setSpacing(5)
+        # Widgets de información
+        self.orden_label = QLabel(f"# Orden: {orden}")
+        self.orden_label.setStyleSheet("font-size: 12pt; color: #555555; font-weight: bold;")
+        group_layout.addWidget(self.orden_label)
 
-            orden_label = QLabel(f"# Orden: {orden}")
-            orden_label.setStyleSheet("""
-                QLabel {
-                    font-size: 12pt; /* Cambia el tamaño de la fuente */
-                    color: #555555; /* Cambia el color del texto */
-                    font-weight: bold; /* Hace el texto en negrita */
-                }
-            """)
-            group_layout.addWidget(orden_label)
+        self.trigger_label = QLabel(f"Trigger: {trigger}")
+        self.trigger_label.setStyleSheet("font-size: 12pt; color: #555555; font-weight: bold;")
+        group_layout.addWidget(self.trigger_label)
 
+        self.contador_label = QLabel(f"Contador: {contador}")
+        self.contador_label.setStyleSheet("font-size: 12pt; color: #555555; font-weight: bold;")
+        group_layout.addWidget(self.contador_label)
 
-            job_tigger_label = QLabel(f"Tigger: {tigger}")
-            job_tigger_label.setStyleSheet("""
-                QLabel {
-                    font-size: 12pt; /* Cambia el tamaño de la fuente */
-                    color: #555555; /* Cambia el color del texto */
-                    font-weight: bold; /* Hace el texto en negrita */
-                }
-            """)
-            group_layout.addWidget(job_tigger_label)
+        self.turno_label = QLabel(f"Turno: {turno}")
+        self.turno_label.setStyleSheet("font-size: 12pt; color: #555555; font-weight: bold;")
+        group_layout.addWidget(self.turno_label)
 
-
-            
-
-            contador_label = QLabel(f"Contador: {contador}")
-            contador_label.setStyleSheet("""
-                QLabel {
-                    font-size: 12pt; /* Cambia el tamaño de la fuente */
-                    color: #555555; /* Cambia el color del texto */
-                    font-weight: bold; /* Hace el texto en negrita */
-                }
-            """)
-            group_layout.addWidget(contador_label)
-
-            status_label = QLabel(f"Status: {status}")
-            status_label.setStyleSheet("""
-                QLabel {
-                    font-size: 12pt; /* Cambia el tamaño de la fuente */
-                    color: #555555; /* Cambia el color del texto */
-                    font-weight: bold; /* Hace el texto en negrita */
-                }
-            """)
-            group_layout.addWidget(status_label)
-
-
-            turno_label = QLabel(f"Turno: {turno}")
-            turno_label.setStyleSheet("""
-                QLabel {
-                    font-size: 12pt; /* Cambia el tamaño de la fuente */
-                    color: #555555; /* Cambia el color del texto */
-                    font-weight: bold; /* Hace el texto en negrita */
-                }
-            """)
-            group_layout.addWidget(turno_label)
-
-           
-            printers_layout.addWidget(group_box, fila, columna)
-
-            self.printer_widgets[name] = (name, orden_label, contador_label, turno_label, job_tigger_label, status_label)
-
-        spacer = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        # printers_layout.addSpacerItem(spacer)
+        # Añadir el QGroupBox al layout
+        printers_layout.addWidget(group_box, 0, 0)
         printers_container.setLayout(printers_layout)
 
-        
-      
-
-        # Añadir elementos al layout principal
+        # Añadir el contenedor al layout principal
         main_layout.addWidget(printers_container)
-        main_layout.addSpacing(5) 
-        self.setup_signals()
+        main_layout.addSpacing(5)
+        print("🚀 inicializado main")
 
-
-    def setup_signals(self):
-        self.opc_manager.data_changed.connect(self.on_data_changed)
-
-
-    def on_data_changed(self, node_id, val):
-        UtilidadGeneral.on_data_changed_opc_manager(node_id, val)
-
+    def update_linea_status(self):
         
+        print("🚀 ~ update_linea_status:",self.utilidad_general.orden_produccion_actual.id)
+        self.orden_label.setText(f"# Orden: {self.utilidad_general.orden_produccion_actual.id}")
+        self.trigger_label.setText(f"Trigger: {self.utilidad_general.job_trigger}")
+        self.contador_label.setText(f"Contador: {self.utilidad_general.terciaria_counter1}")
+        self.turno_label.setText(f"Turno: {self.utilidad_general.turno}")
 
-
-    def update_linea_status(self, name, orden, contador, turno, tigger, status):
-       
-        if name in self.printer_widgets:
-            name, orden_label, contador_label, turno_label, job_tigger_label, status_label = self.printer_widgets[name]
-            # Si se proporciona un nuevo estado, actualizar el texto del estado y el color del indicador
-            if orden is not None:
-                orden_label.setText(f"# Orden: {orden}")
-
-            if contador is not None:
-                contador_label.setText(f"Contador: {contador}")
-
-            if turno is not None:
-                turno_label.setText(f"Turno: {turno}")
-
-            if tigger is not None:
-                job_tigger_label.setText(f"Tigger: {tigger}")
-
-            if status is not None:
-                status_label.setText(f"Status: {status}")
-
-            
     def actualizar_con_datos(self):
+        print("🚀~ actualizar_con_datos" )
+        self.update_linea_status()
 
-        for i in range(1,6):
-            self.update_linea_status(f'Linea {i}',
-                                    UtilidadGeneral.datos_compartidos[f'job_trigger_l{i}'], 
-                                    UtilidadGeneral.datos_compartidos[f'terciaria_counter1_l{i}'],
-                                    UtilidadGeneral.datos_compartidos[f'turno_l{i}'],
-                                    UtilidadGeneral.datos_compartidos[f'terciaria_job_id_l{i}'],
-                                    UtilidadGeneral.datos_compartidos[f'terciaria_status_l{i}'])
     def closeEvent(self, event):
         print("Limpiando antes de cerrar...")
-        UtilidadGeneral.datos_compartidos["opc_manager"].disconnect_opcua()
+        self.utilidad_general.opc_manager.disconnect_opcua()
         event.accept()
             
 

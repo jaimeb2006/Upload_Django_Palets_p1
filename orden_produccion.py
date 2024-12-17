@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 
 
+
 class OrdenProduccion:
     def __init__(self, id, id_fb, sku, planta_primaria, nombre_producto, nombre_abreviado, 
                  ean, destino_primaria, version_primaria, nb_primaria, dias_caducidad, 
@@ -12,8 +13,8 @@ class OrdenProduccion:
                  peso_neto_terciaria, fecha_creacion, estado, fecha_final, planta, prensa, 
                  prensa_numero, linea, lote_completo, lote_numeros, turno, inicio_contador_general, 
                  sscc_inicio , inicio_contador, id_producto, id_fb_producto,fin_contador_general, fin_contador, 
-                 fecha_caducidad_string, subido_a_firebase, inicio_contador_string
-
+                 fecha_caducidad_string, subido_a_firebase, inicio_contador_string,fecha_continuar =None, subido_a_vitacontrol= False,
+                actualizado_a_firebase = False,actualizado_a_vitacontrol= False,id_vitacontrol='',libre=False
 ):
         self.id = id
         self.id_fb = id_fb
@@ -55,7 +56,7 @@ class OrdenProduccion:
         self.planta = planta
         self.prensa = prensa
         self.prensa_numero = prensa_numero
-        self.linea = linea
+        self.linea = str(linea)
         self.lote_completo = lote_completo
         self.lote_numeros = lote_numeros
         self.turno = turno
@@ -67,12 +68,19 @@ class OrdenProduccion:
         self.fin_contador_general = fin_contador_general
         self.fin_contador = fin_contador
         self.fecha_caducidad_string = fecha_caducidad_string
-        self.subido_a_firebase = subido_a_firebase, 
+        self.subido_a_firebase = subido_a_firebase
         self.inicio_contador_string = inicio_contador_string
+        self.fecha_continuar = fecha_continuar
+        self.subido_a_vitacontrol = subido_a_vitacontrol
+        self.actualizado_a_firebase  = actualizado_a_firebase
+        self.actualizado_a_vitacontrol = actualizado_a_vitacontrol
+        self.id_vitacontrol = id_vitacontrol
+        self.libre = libre
 
     def to_dict(self):
         return {
             "id": self.id,
+            "id_fb": self.id_fb,
             "sku": self.sku,
             "planta_primaria": self.planta_primaria,
             "nombre_producto": self.nombre_producto,
@@ -123,16 +131,22 @@ class OrdenProduccion:
             "fin_contador_general": self.fin_contador_general,
             "fin_contador": self.fin_contador,
             "fecha_caducidad_string": self.fecha_caducidad_string,
-            "subido_a_firebase": self.subido_a_firebase,
-            "inicio_contador_string": self.inicio_contador_string
+            "subido_a_firebase": self.subido_a_firebase, 
+            "inicio_contador_string": self.inicio_contador_string,
+            "fecha_continuar": self.fecha_continuar.isoformat() if self.fecha_continuar else None,
+            "subido_a_vitacontrol": self.subido_a_vitacontrol,
+            "actualizado_a_firebase": self.actualizado_a_firebase,
+            "actualizado_a_vitacontrol": self.actualizado_a_vitacontrol,
+            "id_vitacontrol": self.id_vitacontrol,
+            "libre": self.libre
+           
         }
     
-   
     @classmethod
     def default(cls):
         return cls(
-            id=1,
-            id_fb = 'new',
+            id=0,
+            id_fb='',
             sku='1',
             planta_primaria='',
             nombre_producto='',
@@ -183,70 +197,9 @@ class OrdenProduccion:
             fin_contador_general=0,
             fin_contador=0,
             fecha_caducidad_string='',
-            subido_a_firebase = False, 
-            inicio_contador_string = '0001'
+            subido_a_firebase=False, 
+            inicio_contador_string = '0001',
+            fecha_continuar = None,
+            subido_a_vitacontrol=False
+
         )
-    
-    def from_new__orden(self, turno, inicio_contador_general ):
-            #TODO: Corregir Inicio CONTADOR 
-            fecha_creacion = datetime.now()
-            fecha_actual = fecha_creacion.strftime("%y%m%d")
-            fecha_futura = (fecha_creacion + timedelta(days=self.dias_caducidad)).strftime("%d/%m/%y")
-            print("🚀 ~ fecha_futura:", fecha_futura)
-            sscc_inicio = f'{self.planta}{self.linea}{self.prensa_numero}{turno}{self.version_primaria}{fecha_actual}{str(self.id_producto).zfill(4)}'
-            lote_completo = f'{self.destino_primaria}{fecha_actual}{self.prensa}{self.version_primaria}'
-            
-            orden = OrdenProduccion(self.id,
-                                    'new',
-                                    self.sku,
-                                    self.planta_primaria,
-                                    self.nombre_producto,
-                                    self.nombre_abreviado,
-                                    self.ean,
-                                    self.destino_primaria,
-                                    self.version_primaria,
-                                    self.nb_primaria,
-                                    self.dias_caducidad,
-                                    self.id_path,
-                                    self.familia_path,
-                                    self.familia_path_colos,
-                                    self.descripcion_linea_1,
-                                    self.descripcion_linea_2,
-                                    self.descripcion_linea_3,
-                                    self.proteina,
-                                    self.humedad,
-                                    self.ceniza,
-                                    self.grasa,
-                                    self.fibra,
-                                    self.ingredientes_linea_1,
-                                    self.ingredientes_linea_2,
-                                    self.ingredientes_linea_3,
-                                    self.ingredientes_linea_4,
-                                    self.ingredientes_linea_5,
-                                    self.registro_sanitario,
-                                    self.fabricado_para,
-                                    self.direccion_fabricante,
-                                    self.ruc_fabricante,
-                                    self.version_secundaria,
-                                    self.cantidad_terciaria,
-                                    self.peso_neto_terciaria,
-                                    fecha_creacion,
-                                    'INICIO',
-                                    fecha_creacion,
-                                    self.planta,
-                                    self.prensa,
-                                    self.prensa_numero,
-                                    self.linea,
-                                    lote_completo,
-                                    fecha_actual,
-                                    turno,
-                                    inicio_contador_general,
-                                    sscc_inicio,
-                                    0,
-                                    self.id_producto,
-                                    self.id_fb_producto,
-                                    inicio_contador_general,
-                                    inicio_contador_general,
-                                    fecha_futura, False,
-                                    str(inicio_contador_general).zfill(4))
-            return orden
