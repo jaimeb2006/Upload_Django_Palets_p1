@@ -4,9 +4,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QLabel, QGridLayout, QPushButton,
                                QVBoxLayout, QHBoxLayout, QPushButton,QStackedWidget, QFrame, 
                                QGroupBox,  QSpacerItem, QSizePolicy, QLineEdit)
-from PySide6.QtCore import Qt
 
-from orden_produccion import OrdenProduccion
 from utilidad_general import UtilidadGeneral
 
 

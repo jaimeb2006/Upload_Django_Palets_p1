@@ -9,7 +9,8 @@ class Palet:
                  fecha_creacion, fecha_actualizacion, id_bodega_origen, id_bodega_destino,
                  movimientos_id, movimientos_nombre, fechas_movimientos, usuarios_movimientos,
                  turno, id_usuario, id_orden_produccion, subido_a_firebase, subido_a_vitacontrol,
-                 fecha_caducidad_string, peso_neto_terciaria, linea_letra, numero_palet_string):
+                 fecha_caducidad_string, peso_neto_terciaria, linea_letra, numero_palet_string, id_vitacontrol 
+                 ):
         self.id = id
         self.id_fb = id_fb
         self.sku = sku
@@ -44,6 +45,7 @@ class Palet:
         self.peso_neto_terciaria = peso_neto_terciaria
         self.linea_letra = linea_letra
         self.numero_palet_string = numero_palet_string
+        self.id_vitacontrol = id_vitacontrol
 
 
     def to_dict(self):
@@ -81,21 +83,19 @@ class Palet:
             "fecha_caducidad_string": self.fecha_caducidad_string, 
             "peso_neto_terciaria": self.peso_neto_terciaria, 
             "linea_letra": self.linea_letra, 
-            "numero_palet_string": self.numero_palet_string
-
+            "numero_palet_string": self.numero_palet_string,
+            "id_vitacontrol": self.id_vitacontrol
         }
 
 
     def from_orden_produccion_to_palet( orden_produccion: OrdenProduccion, numero_actual, subido_a_firebase: bool, subido_a_vitacontrol: bool):
-        sscc_inicio = f'{orden_produccion.planta}{orden_produccion.linea}{orden_produccion.prensa_numero}{orden_produccion.turno}{orden_produccion.version_primaria}{orden_produccion.lote_numeros}{str(orden_produccion.id_producto).zfill(4)}{str(numero_actual).zfill(4)}'
+        sscc_inicio = f'{orden_produccion.planta}{orden_produccion.linea}{orden_produccion.prensa_numero}{str(orden_produccion.turno).zfill(2)}{orden_produccion.version_primaria}{orden_produccion.lote_numeros}{str(orden_produccion.id_producto).zfill(4)}{str(numero_actual).zfill(4)}'
         print("🚀 ~ sscc_inicio:", sscc_inicio)
-        ean13 = f"]C102S{orden_produccion.sku}@30{orden_produccion.cantidad_terciaria}@10{orden_produccion.lote_completo}"
+        ean13 = f"{orden_produccion.sku}@30{orden_produccion.cantidad_terciaria}@10{orden_produccion.lote_completo}"
         print("🚀 ~ ean13:", ean13, orden_produccion.fecha_caducidad_string )
         fecha_caducidad = datetime.strptime(orden_produccion.fecha_caducidad_string, "%d/%m/%y")
         id_usuario = f'produccion_p{orden_produccion.planta}_l{orden_produccion.linea}'
         numero_actual_string = str(numero_actual).zfill(4)
-
-
         return Palet(
             id=1,
             id_fb='id_fb',
@@ -130,8 +130,8 @@ class Palet:
             fecha_caducidad_string=orden_produccion.fecha_caducidad_string, 
             peso_neto_terciaria = orden_produccion.peso_neto_terciaria, 
             linea_letra = orden_produccion.linea,
-            numero_palet_string = numero_actual_string
-            )
+            numero_palet_string = numero_actual_string,
+            id_vitacontrol = ' ')
             
 
             
