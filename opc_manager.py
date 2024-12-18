@@ -39,6 +39,7 @@ class OpcManager(QObject):
         loop.run_until_complete(self.monitor_connection())
     
     async def monitor_connection(self):
+        self.reconnected_to_opcua()
         while True:
             try:
                 # Intenta leer un nodo específico como señal de vida

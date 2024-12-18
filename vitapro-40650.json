@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "vitapro-40650",
+  "private_key_id": "415ff301b0f13bb85e23c4b16727a5b0277a385a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7hlqVmJBmJWiW\nFs3twkXfFtBQVTEdr3FsLK5GAmYvk9wJ6qolc9hNdPoY73zmSfI9wODYBYL6t+cN\n9KLtKA9hDN6dIsoQDtlrVkgeS1cEX5B6d7de8uYgK2Rz1Zv4aQaHz67IiG/mjhs2\nokhN5/oKyTLrP+xMQ4kiroys1YRrt5GZ7cvPUaAOJyu7ISdncLNO5ERzbZvbZXvn\n53lzIwqS5vKNFHUYnReEeAJETCnAESI8VymCueEm3CPapdxbYzrexFXque8nJiMN\nMfw+ym8uulhjxSqNUzBkGZA9iWJ0Xir+s+AFOkDCxTBVfjJ4qvxCZuXrtDzNUOC4\nWoLYNudlAgMBAAECggEAG56m9OWq+asvg6Ze36f/i+OGUcQFH0QvRn7bjurc4Mu8\nWvw54e5KwOMmevRlxwgZKnNK1UZqi5b5QcWdwaRm2iUqcfvPxccKID8YZtiIkSz/\ne1TqqIzKIZmCisppgJBSKpVc6aL+0vcXQa1r94g1UdAJ3zsOXg/hwOlImvmP2XVy\n6kUuJaxGLPz2IKO2sdmlx3T8tkQ1SHHC8voPJymPVSvf+n6TaI3SByBnEkRGdKUd\nq/Qvt2AEu/Ud7KK1Y0fNDcklgkTFFXMgImNktVP0shK6rdUHfNY7yqqsmzN9WClY\nTONsQUyss/QGjrXlWl+5Z1jS1AGBBWmAkgfGvJ1CeQKBgQDfGdaFUlWnn/5ncUCi\np1XRmHR+ROBEdPO2R69Ak25PSxPFYt1v6lCIIWnsbmm+de+5MzgftoB/ad+wK/gV\nPnjgiMrNQDMwYJw+KvIiqCE7cRPrNneCbsKn1OqDEk12Ns/EDnHzD7LiqtGVuQ4Z\nqVjVKKLLfIRX547OQLpYpjN6CwKBgQDXLYBgYreVzw4cIySE0KUnvA50ZIZaDXt+\nq8YW2+dEjWt3QVgoFo557sZZYED9+vMdFgOo1I8PWK/hKxTovfk2qr+u8V2nkpG8\n2YcTDLKpI/Lbs8qEy/emFHwI/+DVq920sUAlGBZ1QaQmkf6DjyoF9MWVc+81UhwV\n39g6WGF6TwKBgQCQ2h7NazrP3fJ4yTB1Kv5uWnTwctnFuMVvyTVBUTfi5dUNaHZr\nro/hAwjaCIpBriMadOXwuTbPAzfIE5Q8ftZOuqIqB4/0zhVDy/Bwjgcdp/qN0kxf\n9HgQLg6hUWXX5hiZq+NSNBQqVUxE0OUVxj02EO85/TuUM3Ul9yLGYgq0JwKBgQDL\n0h/uLNP1JYIaCPfIjtJCBxIyEh5pIqg93nvunzI7bzHCbrUQk/01ZoWfl1s4uQKc\nJIQm4eD5CmrfAK33oCt2KtsS3TJ3TpCZr/sQglChgpnCnlVQ4NueB31OEQJpoziI\ntfUqrdxoCVtx5YyOFYgayDZ4UK7fdP2Bgt0QtzLuZQKBgFAPzvxK2BAGZZprVHv8\nEudMgFJIwKuHjVSBF69MvRUAfT8GxzCW+f2STn0fLvxETO5nqgh+UFax0oFPtftu\nfLVuMq5e7RvUmnPxM2DJEguSo/38FXWjf4LtxyQt/y4b2kv98xSGxAYQuGAEt2X6\nx5p4aHCZxd/nNCgSsp+wII2s\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-qlt2j@vitapro-40650.iam.gserviceaccount.com",
+  "client_id": "108018587240793573385",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-qlt2j%40vitapro-40650.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

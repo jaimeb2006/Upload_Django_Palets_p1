@@ -86,6 +86,45 @@ class Palet:
             "numero_palet_string": self.numero_palet_string,
             "id_vitacontrol": self.id_vitacontrol
         }
+    
+    def to_dict_firebase(self):
+        return {
+            "id": self.id,
+            "id_fb": self.id_fb,
+            "sku": self.sku,
+            "nombre_producto": self.nombre_producto,
+            "ean13": self.ean13,
+            "planta_primaria": self.planta_primaria,
+            "linea": self.linea,
+            "llenadora": self.llenadora,
+            "prensa": self.prensa,
+            "prensa_numero": self.prensa_numero,
+            "version_primaria": self.version_primaria,
+            "lote_completo": self.lote_completo,
+            "cantidad": self.cantidad,
+            "sscc": self.sscc,
+            "fecha_elaboracion": self.fecha_elaboracion if self.fecha_elaboracion else None,
+            "fecha_caducidad": self.fecha_caducidad if self.fecha_caducidad else None,
+            "numero_palet": self.numero_palet,
+            "fecha_creacion": self.fecha_creacion if self.fecha_creacion else None,
+            "fecha_actualizacion": self.fecha_actualizacion if self.fecha_actualizacion else None,
+            "id_bodega_origen": self.id_bodega_origen,
+            "id_bodega_destino": self.id_bodega_destino,
+            "movimientos_id": self.movimientos_id,
+            "movimientos_nombre": self.movimientos_nombre,
+            "fechas_movimientos": self.fechas_movimientos if self.fechas_movimientos else [],
+            "usuarios_movimientos": self.usuarios_movimientos,
+            "turno": self.turno,
+            "id_usuario": self.id_usuario,
+            "id_orden_produccion": self.id_orden_produccion,
+            "subido_a_firebase": True,
+            "subido_a_vitacontrol": self.subido_a_vitacontrol,
+            "fecha_caducidad_string": self.fecha_caducidad_string, 
+            "peso_neto_terciaria": self.peso_neto_terciaria, 
+            "linea_letra": self.linea_letra, 
+            "numero_palet_string": self.numero_palet_string,
+            "id_vitacontrol": self.id_vitacontrol
+        }
 
 
     def from_orden_produccion_to_palet( orden_produccion: OrdenProduccion, numero_actual, subido_a_firebase: bool, subido_a_vitacontrol: bool):
