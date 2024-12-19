@@ -15,8 +15,11 @@ class MainWindow(QMainWindow):
         self.linea = self.utilidad_general.linea
         printer_info = (f'Línea {self.linea}', 0, 0, 0, 0)
         self.setWindowTitle(f'Sin L{self.linea}')
-        posicion_x = ((self.linea)-1)*250
-        self.setGeometry(posicion_x, 0, 250, 200)
+        posicion_x = (self.linea-1)*250
+        posicion_y = 0
+        if self.linea > 1:
+            posicion_y = 30
+        self.setGeometry(posicion_x, posicion_y, 250, 200)
         self.utilidad_general.suscribir(self)
 
         # Widget central y layout principal

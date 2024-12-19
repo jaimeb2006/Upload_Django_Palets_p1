@@ -9,9 +9,9 @@ from palet import Palet
 
 class FirebaseManager:
     def __init__(self, django_manager: DjangoManager, linea: str):
-        cred = credentials.Certificate("./vitapro-40650.json")
+        # cred = credentials.Certificate("./vitapro-40650.json")
         # cred = credentials.Certificate("./vitaproapp.json")
-        # cred = credentials.Certificate("C:/ProgramData/Inbalnor/vitaproapp.json")
+        cred = credentials.Certificate("C:/ProgramData/Inbalnor/vitaproapp.json")
         self.upload_in_progress = False
         self.django_manager = django_manager
         self.linea = linea
