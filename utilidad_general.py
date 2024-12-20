@@ -67,7 +67,7 @@ class UtilidadGeneral:
         self.actualizar_productos_addresses =  "ns=2;s=Inbalnor_OPC.generales.p1_actualizar_productos"
         # Opc addresses subscription
         self.opc_addresses_subcription = {
-            'job_trigger': f'ns=2;s=Inbalnor_OPC.generales.p1_l{self.linea}_job_trigger',
+            'job_trigger': f'ns=2;s=Inbalnor_OPC.generales.p1_l{self.linea}_job_trigger_terciaria',
             # 'terciaria_counter1': f'ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.Counter1',
             # 'terciaria_total_counter': f'ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.TotalCount',
             # 'terciaria_job_id': f"ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.CurrentProduct",
