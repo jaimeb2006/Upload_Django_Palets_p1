@@ -90,7 +90,6 @@ class Palet:
     def to_dict_firebase(self):
         return {
             "id": self.id,
-            "id_fb": self.id_fb,
             "sku": self.sku,
             "nombre_producto": self.nombre_producto,
             "ean13": self.ean13,
@@ -110,10 +109,13 @@ class Palet:
             "fecha_actualizacion": self.fecha_actualizacion if self.fecha_actualizacion else None,
             "id_bodega_origen": self.id_bodega_origen,
             "id_bodega_destino": self.id_bodega_destino,
-            "movimientos_id": self.movimientos_id,
-            "movimientos_nombre": self.movimientos_nombre,
-            "fechas_movimientos": self.fechas_movimientos if self.fechas_movimientos else [],
-            "usuarios_movimientos": self.usuarios_movimientos,
+            "movimientos":[ { 
+                "id_bodega": f'{self.id_bodega_origen}-{self.id_bodega_destino}',
+                "nombre": f'{self.movimientos_nombre[0]}_l{self.linea}', 
+                "email":f'{self.movimientos_nombre[0]}_l{self.linea}',
+                "usuario": self.usuarios_movimientos[0],
+                "fecha": self.fechas_movimientos[0] if self.fechas_movimientos else datetime.now().isoformat(),
+                }],
             "turno": self.turno,
             "id_usuario": self.id_usuario,
             "id_orden_produccion": self.id_orden_produccion,
@@ -123,7 +125,9 @@ class Palet:
             "peso_neto_terciaria": self.peso_neto_terciaria, 
             "linea_letra": self.linea_letra, 
             "numero_palet_string": self.numero_palet_string,
-            "id_vitacontrol": self.id_vitacontrol
+            "id_vitacontrol": self.id_vitacontrol, 
+            "id_bodega_actual": f'{self.id_bodega_origen}-{self.id_bodega_destino}',
+            'planta': self.movimientos_nombre[0]
         }
 
 
