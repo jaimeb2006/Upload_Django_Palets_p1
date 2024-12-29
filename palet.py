@@ -115,8 +115,9 @@ class Palet:
             "fecha_elaboracion": self.parse_datetime_with_timezone(self.fecha_elaboracion) ,
             "fecha_caducidad": self.parse_datetime_with_timezone(self.fecha_caducidad ),
             "numero_palet": self.numero_palet,
-            "fecha_creacion": self.fecha_creacion if self.fecha_creacion else None,
-            "fecha_actualizacion": self.fecha_actualizacion if self.fecha_actualizacion else None,
+            "fecha_creacion": self.parse_datetime_with_timezone(self.fecha_creacion ),
+            "fecha_recepcion_bodega": self.parse_datetime_with_timezone(self.fecha_creacion ),
+            "fecha_actualizacion":  self.parse_datetime_with_timezone(self.fecha_actualizacion ),
             "id_bodega_origen": self.id_bodega_origen,
             "id_bodega_destino": self.id_bodega_destino,
             "movimientos": [
@@ -125,7 +126,7 @@ class Palet:
                     "nombre": f'{self.movimientos_nombre[0]}_l{self.linea}', 
                     "email": f'{self.movimientos_nombre[0]}_l{self.linea}',
                     "usuario": self.usuarios_movimientos[0],
-                    "fecha": self.fechas_movimientos[0] if self.fechas_movimientos else datetime.now(),
+                    "fecha":  self.parse_datetime_with_timezone(self.fechas_movimientos[0]) ,
                 }
             ],
             "turno": self.turno,
