@@ -88,7 +88,13 @@ class Palet:
             "id_vitacontrol": self.id_vitacontrol
         }
     
-
+    def parse_datetime_with_timezone(date_string):
+        try:
+            # Parsear la cadena de fecha con zona horaria
+            return datetime.fromisoformat(date_string)  # Maneja fechas en formato ISO 8601
+        except ValueError:
+            print(f"Formato de fecha inválido: {date_string}")
+            return datetime.now()
         
 
     def to_dict_firebase(self):
@@ -106,8 +112,8 @@ class Palet:
             "lote_completo": self.lote_completo,
             "cantidad": self.cantidad,
             "sscc": self.sscc,
-            "fecha_elaboracion": self.fecha_elaboracion if self.fecha_elaboracion else None,
-            "fecha_caducidad": self.fecha_caducidad if self.fecha_caducidad else None,
+            "fecha_elaboracion": self.parse_datetime_with_timezone(self.fecha_elaboracion) ,
+            "fecha_caducidad": self.parse_datetime_with_timezone(self.fecha_caducidad ),
             "numero_palet": self.numero_palet,
             "fecha_creacion": self.fecha_creacion if self.fecha_creacion else None,
             "fecha_actualizacion": self.fecha_actualizacion if self.fecha_actualizacion else None,
