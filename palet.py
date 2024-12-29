@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from orden_produccion import OrdenProduccion
-from firebase_admin import firestore
-from google.cloud.firestore import Timestamp
+
 
 class Palet:
     def __init__(self, id, id_fb, sku, nombre_producto, ean13, planta_primaria,
