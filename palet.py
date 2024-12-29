@@ -88,7 +88,7 @@ class Palet:
             "id_vitacontrol": self.id_vitacontrol
         }
     
-    def parse_datetime_with_timezone(date_string):
+    def parse_datetime_with_timezone(self, date_string):
         try:
             # Parsear la cadena de fecha con zona horaria
             return datetime.fromisoformat(date_string)  # Maneja fechas en formato ISO 8601
