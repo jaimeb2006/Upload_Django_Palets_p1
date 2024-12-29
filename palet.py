@@ -10,7 +10,8 @@ class Palet:
                  fecha_creacion, fecha_actualizacion, id_bodega_origen, id_bodega_destino,
                  movimientos_id, movimientos_nombre, fechas_movimientos, usuarios_movimientos,
                  turno, id_usuario, id_orden_produccion, subido_a_firebase, subido_a_vitacontrol,
-                 fecha_caducidad_string, peso_neto_terciaria, linea_letra, numero_palet_string, id_vitacontrol 
+                 fecha_caducidad_string, peso_neto_terciaria, linea_letra, numero_palet_string, id_vitacontrol, 
+                 codigo_bodega_actual ,    id_fb_producto ,    id_producto
                  ):
         self.id = id
         self.id_fb = id_fb
@@ -47,6 +48,9 @@ class Palet:
         self.linea_letra = linea_letra
         self.numero_palet_string = numero_palet_string
         self.id_vitacontrol = id_vitacontrol
+        self.codigo_bodega_actual = codigo_bodega_actual
+        self.id_fb_producto = id_fb_producto
+        self.id_producto = id_producto
 
 
     def to_dict(self):
@@ -85,7 +89,11 @@ class Palet:
             "peso_neto_terciaria": self.peso_neto_terciaria, 
             "linea_letra": self.linea_letra, 
             "numero_palet_string": self.numero_palet_string,
-            "id_vitacontrol": self.id_vitacontrol
+            "id_vitacontrol": self.id_vitacontrol,
+            "codigo_bodega_actual": self.codigo_bodega_actual if self.codigo_bodega_actual else '0-0',
+            "id_fb_producto": self.id_fb_producto if self.id_fb_producto else '-1',
+            "id_producto": self.id_producto if self.id_producto else -1,
+            'planta': self.movimientos_nombre[0],
         }
     
     def parse_datetime_with_timezone(self, date_string):
@@ -139,8 +147,10 @@ class Palet:
             "linea_letra": self.linea_letra, 
             "numero_palet_string": self.numero_palet_string,
             "id_vitacontrol": self.id_vitacontrol, 
-            "id_bodega_actual": f'{self.id_bodega_origen}-{self.id_bodega_destino}',
-            'planta': self.movimientos_nombre[0]
+            "codigo_bodega_actual": f'{self.id_bodega_origen}-{self.id_bodega_destino}',
+            "id_fb_producto": self.id_fb_producto if self.id_fb_producto else '-1',
+            "id_producto": self.id_producto if self.id_producto else -1,
+            'planta': self.movimientos_nombre[0],
         }
 
 
@@ -188,7 +198,11 @@ class Palet:
             peso_neto_terciaria = orden_produccion.peso_neto_terciaria, 
             linea_letra = orden_produccion.linea,
             numero_palet_string = numero_actual_string,
-            id_vitacontrol = ' ')
+            id_vitacontrol = ' ',
+            codigo_bodega_actual = '0-0',
+            id_fb_producto = orden_produccion.id_fb_producto,
+            id_producto = orden_produccion.id_producto
+            )
             
 
             
