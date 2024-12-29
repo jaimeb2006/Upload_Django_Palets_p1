@@ -90,6 +90,8 @@ class Palet:
         }
     
 
+        
+
     def to_dict_firebase(self):
         return {
             "id": self.id,
@@ -105,11 +107,11 @@ class Palet:
             "lote_completo": self.lote_completo,
             "cantidad": self.cantidad,
             "sscc": self.sscc,
-            "fecha_elaboracion": Timestamp.from_datetime(self.fecha_elaboracion) if self.fecha_elaboracion else None,
-            "fecha_caducidad": Timestamp.from_datetime(self.fecha_caducidad) if self.fecha_caducidad else None,
+            "fecha_elaboracion": self.fecha_elaboracion if self.fecha_elaboracion else None,
+            "fecha_caducidad": self.fecha_caducidad if self.fecha_caducidad else None,
             "numero_palet": self.numero_palet,
-            "fecha_creacion": Timestamp.from_datetime(self.fecha_creacion) if self.fecha_creacion else None,
-            "fecha_actualizacion": Timestamp.from_datetime(self.fecha_actualizacion) if self.fecha_actualizacion else None,
+            "fecha_creacion": self.fecha_creacion if self.fecha_creacion else None,
+            "fecha_actualizacion": self.fecha_actualizacion if self.fecha_actualizacion else None,
             "id_bodega_origen": self.id_bodega_origen,
             "id_bodega_destino": self.id_bodega_destino,
             "movimientos": [
@@ -118,7 +120,7 @@ class Palet:
                     "nombre": f'{self.movimientos_nombre[0]}_l{self.linea}', 
                     "email": f'{self.movimientos_nombre[0]}_l{self.linea}',
                     "usuario": self.usuarios_movimientos[0],
-                    "fecha": Timestamp.from_datetime(self.fechas_movimientos[0]) if self.fechas_movimientos else firestore.SERVER_TIMESTAMP,
+                    "fecha": self.fechas_movimientos[0] if self.fechas_movimientos else datetime.now(),
                 }
             ],
             "turno": self.turno,
