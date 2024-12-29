@@ -93,7 +93,10 @@ class Palet:
             "codigo_bodega_actual": self.codigo_bodega_actual if self.codigo_bodega_actual else '0-0',
             "id_fb_producto": self.id_fb_producto if self.id_fb_producto else '-1',
             "id_producto": self.id_producto if self.id_producto else -1,
-            'planta': self.movimientos_nombre[0],
+            # "planta": self.movimientos_nombre[0],
+            # "planta_linea": f'{self.movimientos_nombre[0]}_l{self.linea}',
+            # "id_last_session": f'produccion_{self.movimientos_nombre[0]}',
+           
         }
     
     def parse_datetime_with_timezone(self, date_string):
@@ -134,7 +137,8 @@ class Palet:
                     "nombre": f'{self.movimientos_nombre[0]}_l{self.linea}', 
                     "email": f'{self.movimientos_nombre[0]}_l{self.linea}',
                     "usuario": self.usuarios_movimientos[0],
-                    "fecha":  self.parse_datetime_with_timezone(self.fechas_movimientos[0]) ,
+                    "fecha":  self.parse_datetime_with_timezone(self.fechas_movimientos[0]),
+                    "id_session": f'produccion_{self.movimientos_nombre[0]}',
                 }
             ],
             "turno": self.turno,
@@ -150,16 +154,17 @@ class Palet:
             "codigo_bodega_actual": f'{self.id_bodega_origen}-{self.id_bodega_destino}',
             "id_fb_producto": self.id_fb_producto if self.id_fb_producto else '-1',
             "id_producto": self.id_producto if self.id_producto else -1,
-            'planta': self.movimientos_nombre[0],
+            "planta": self.movimientos_nombre[0],
+            "planta_linea": f'{self.movimientos_nombre[0]}_l{self.linea}',
+            "id_last_session": f'produccion_{self.movimientos_nombre[0]}',
         }
 
 
 
     def from_orden_produccion_to_palet( orden_produccion: OrdenProduccion, numero_actual, subido_a_firebase: bool, subido_a_vitacontrol: bool):
         sscc_inicio = f'{orden_produccion.planta}{orden_produccion.linea}{orden_produccion.prensa_numero}{str(orden_produccion.turno).zfill(2)}{orden_produccion.version_primaria}{orden_produccion.lote_numeros}{str(orden_produccion.id_producto).zfill(4)}{str(numero_actual).zfill(4)}'
-        print("🚀 ~ sscc_inicio:", sscc_inicio)
         ean13 = f"{orden_produccion.sku}@30{orden_produccion.cantidad_terciaria}@10{orden_produccion.lote_completo}"
-        print("🚀 ~ ean13:", ean13, orden_produccion.fecha_caducidad_string )
+        print("🚀 ~ ean13:", ean13 , 'sscc_inicio: ', sscc_inicio)
         fecha_caducidad = datetime.strptime(orden_produccion.fecha_caducidad_string, "%d/%m/%y")
         id_usuario = f'produccion_p{orden_produccion.planta}_l{orden_produccion.linea}'
         numero_actual_string = str(numero_actual).zfill(4)
