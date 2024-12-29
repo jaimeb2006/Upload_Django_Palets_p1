@@ -2,6 +2,7 @@ from datetime import datetime
 
 from orden_produccion import OrdenProduccion
 from firebase_admin import firestore
+from google.cloud.firestore import Timestamp
 
 class Palet:
     def __init__(self, id, id_fb, sku, nombre_producto, ean13, planta_primaria,
@@ -104,11 +105,11 @@ class Palet:
             "lote_completo": self.lote_completo,
             "cantidad": self.cantidad,
             "sscc": self.sscc,
-            "fecha_elaboracion": firestore.Timestamp.from_datetime(self.fecha_elaboracion) if self.fecha_elaboracion else None,
-            "fecha_caducidad": firestore.Timestamp.from_datetime(self.fecha_caducidad) if self.fecha_caducidad else None,
+            "fecha_elaboracion": Timestamp.from_datetime(self.fecha_elaboracion) if self.fecha_elaboracion else None,
+            "fecha_caducidad": Timestamp.from_datetime(self.fecha_caducidad) if self.fecha_caducidad else None,
             "numero_palet": self.numero_palet,
-            "fecha_creacion": firestore.Timestamp.from_datetime(self.fecha_creacion) if self.fecha_creacion else None,
-            "fecha_actualizacion": firestore.Timestamp.from_datetime(self.fecha_actualizacion) if self.fecha_actualizacion else None,
+            "fecha_creacion": Timestamp.from_datetime(self.fecha_creacion) if self.fecha_creacion else None,
+            "fecha_actualizacion": Timestamp.from_datetime(self.fecha_actualizacion) if self.fecha_actualizacion else None,
             "id_bodega_origen": self.id_bodega_origen,
             "id_bodega_destino": self.id_bodega_destino,
             "movimientos": [
@@ -117,7 +118,7 @@ class Palet:
                     "nombre": f'{self.movimientos_nombre[0]}_l{self.linea}', 
                     "email": f'{self.movimientos_nombre[0]}_l{self.linea}',
                     "usuario": self.usuarios_movimientos[0],
-                    "fecha": firestore.Timestamp.from_datetime(self.fechas_movimientos[0]) if self.fechas_movimientos else firestore.SERVER_TIMESTAMP,
+                    "fecha": Timestamp.from_datetime(self.fechas_movimientos[0]) if self.fechas_movimientos else firestore.SERVER_TIMESTAMP,
                 }
             ],
             "turno": self.turno,
