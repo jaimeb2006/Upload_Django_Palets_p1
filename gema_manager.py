@@ -127,8 +127,10 @@ class GemaManager:
             self.connection.commit()
             print(f"Record for batch {data['batch']} inserted successfully.")
             cursor.close()
+            return True
         except Exception as e:
             print(f"Failed to insert record for batch {data['batch']}: {e}")
+            return False
 
     def upload_pending_palets(self):
         """Verifica y sube los palets con `subido_a_vitacontrol=False`."""
@@ -181,7 +183,7 @@ class GemaManager:
                         "unit_of_measurement": 'UND'
                     }
                     result = self.insert_conforming_product_quantity(record)
-                    if result is None:
+                    if not result:
                         print(f"Error inserting record for Palet {palet.id} marked as uploaded.")
                     else:
                         # Marca el palet como subido
