@@ -8,3 +8,4 @@ weasyprint
 python-dateutil
 pyinstaller
 pycomm3
+psycopg2

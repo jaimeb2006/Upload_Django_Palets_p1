@@ -62,7 +62,7 @@ class FirebaseManager:
                 print(f"Error during upload process: {e}")
 
             # Esperar antes de reintentar si no hay más palets pendientes
-            time.sleep(self.retry_interval)
+            # time.sleep(self.retry_interval)
 
         self.upload_in_progress = False
 

@@ -4,6 +4,7 @@ import time
 
 from django_manager import DjangoManager
 from firebase_manager import FirebaseManager
+from gema_manager import GemaManager
 from opc_manager import OpcManager
 from orden_produccion import OrdenProduccion
 from palet import Palet
@@ -87,6 +88,7 @@ class UtilidadGeneral:
         self.django_manager = DjangoManager()
         self.firebase_manager = FirebaseManager(self.django_manager, str(self.linea))
         self.opc_manager = OpcManager(self.opc_url,self.opc_addresses_subcription, self.actualizar_productos_addresses)
+        self.gema_manager = GemaManager(django_manager=self.django_manager, linea=str(self.linea))
         self.opc_manager.init_opcua()
         self.suscriptores = []
         self.initialized = True
@@ -96,6 +98,7 @@ class UtilidadGeneral:
 
     def update_firebase(self):
         self.firebase_manager.set_palet_in_firebase()
+        self.gema_manager.upload_pending_palets()
 
 
     def setup_signals(self):

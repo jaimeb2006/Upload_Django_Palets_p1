@@ -178,6 +178,25 @@ class DjangoManager:
         except Exception as e:
             print(f"Error while fetching pending palets: {e}")
             return []
+        
+
+    def get_palets_pendientes_mas_bajos_gema(self, linea: str):
+        url = f"{self.base_url}/api/palets/?linea={linea}&subido_a_vitacontrol=False&ordering=id&limit=5"
+        try:
+            response = self._send_request("GET", url)
+            if response.status_code == 200:
+                palets_data = response.json()
+                if len(palets_data) > 0:
+                    return [self._convertir_a_palet(palet) for palet in palets_data]
+                else:
+                    print("No pending palets found with the specified conditions.")
+                    return []
+            else:
+                print(f"Error in response: Status code {response.status_code}, Response: {response.text}")
+                return []
+        except Exception as e:
+            print(f"Error while fetching pending palets: {e}")
+            return []
 
 
         
@@ -185,6 +204,17 @@ class DjangoManager:
         url = f"{self.base_url}/api/palets/{id}/"
         data = {
         "subido_a_firebase":True,
+        "id_fb": ref_firebase,
+
+        }
+        response = self._send_request("PATCH", url, data=data)
+        return self._convertir_a_palet(response.json())
+    
+
+    def update_palet_gema(self, id, ref_firebase):
+        url = f"{self.base_url}/api/palets/{id}/"
+        data = {
+        "subido_a_vitacontrol":True,
         "id_fb": ref_firebase,
 
         }
