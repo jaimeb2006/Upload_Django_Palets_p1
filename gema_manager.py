@@ -180,11 +180,13 @@ class GemaManager:
                         "pallet_number": palet.numero_palet,
                         "unit_of_measurement": 'UND'
                     }
-                    self.insert_conforming_product_quantity(record)
-
-                    # Marca el palet como subido
-                    self.django_manager.update_palet_gema(palet.id)
-                    print(f"Palet {palet.id} marked as uploaded.")
+                    result = self.insert_conforming_product_quantity(record)
+                    if result is None:
+                        print(f"Error inserting record for Palet {palet.id} marked as uploaded.")
+                    else:
+                        # Marca el palet como subido
+                        self.django_manager.update_palet_gema(palet.id)
+                        print(f"Palet {palet.id} marked as uploaded.")
                     time.sleep(1)  # Pausa breve entre subidas para evitar saturar la conexión
 
                 # time.sleep(self.retry_interval)
