@@ -211,11 +211,11 @@ class DjangoManager:
         return self._convertir_a_palet(response.json())
     
 
-    def update_palet_gema(self, id, ref_firebase):
+    def update_palet_gema(self, id, id_gema):
         url = f"{self.base_url}/api/palets/{id}/"
         data = {
         "subido_a_vitacontrol":True,
-        "id_fb": ref_firebase,
+        "id_vitacontrol": id_gema,
 
         }
         response = self._send_request("PATCH", url, data=data)

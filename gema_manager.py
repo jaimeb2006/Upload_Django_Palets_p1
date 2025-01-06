@@ -107,7 +107,16 @@ class GemaManager:
             return None
 
     def insert_conforming_product_quantity(self, data: dict):
-        """Inserta un registro en la tabla `production.conforming_product_quantity`."""
+        """
+        Inserta un registro en la tabla `production.conforming_product_quantity` y devuelve el ID generado.
+
+        Args:
+            data (dict): Datos a insertar en la tabla.
+
+        Returns:
+            int: ID del registro insertado si la operación tiene éxito.
+            None: Si ocurre algún error.
+        """
         try:
             cursor = self.connection.cursor()
             query = sql.SQL("""
@@ -117,6 +126,7 @@ class GemaManager:
                     id_shift_report, sscc, pallet_number, unit_of_measurement
                 )
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id_conforming_product_quantity
             """)
             cursor.execute(query, (
                 data["date"], data["time"], data["id_packaging_line"],
@@ -124,13 +134,16 @@ class GemaManager:
                 data["batch"], data["bags_quantity"], data.get("id_shift_report"),
                 data.get("sscc"), data.get("pallet_number"), data["unit_of_measurement"]
             ))
+            id_conforming_product_quantity = cursor.fetchone()[0]  # Obtener el ID generado
             self.connection.commit()
-            print(f"Record for batch {data['batch']} inserted successfully.")
             cursor.close()
-            return True
+            print(f"Record for batch {data['batch']} inserted successfully with ID: {id_conforming_product_quantity}.")
+            return id_conforming_product_quantity
         except Exception as e:
+            self.connection.rollback()  # Revertir la transacción en caso de error
             print(f"Failed to insert record for batch {data['batch']}: {e}")
-            return False
+            return None
+
 
     def upload_pending_palets(self):
         """Verifica y sube los palets con `subido_a_vitacontrol=False`."""
@@ -183,12 +196,12 @@ class GemaManager:
                         "unit_of_measurement": 'UND'
                     }
                     result = self.insert_conforming_product_quantity(record)
-                    if not result:
+                    if result is None:
                         print(f"Error inserting record for Palet {palet.id} marked as uploaded.")
                     else:
                         # Marca el palet como subido
-                        self.django_manager.update_palet_gema(palet.id)
-                        print(f"Palet {palet.id} marked as uploaded.")
+                        self.django_manager.update_palet_gema(palet.id, result)
+                        print(f"Palet {palet.id} marked as uploaded with Gema ID: {result}.")
                     time.sleep(1)  # Pausa breve entre subidas para evitar saturar la conexión
 
                 # time.sleep(self.retry_interval)
