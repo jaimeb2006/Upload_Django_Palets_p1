@@ -211,12 +211,12 @@ class GemaManager:
             dict: Diccionario con la fecha y la hora local separadas.
         """
         try:
-            fecha_utc5 = datetime.fromisoformat(fecha_creacion)
-            zona_guayaquil = ZoneInfo("America/Guayaquil")
-            fecha_local = fecha_utc5.astimezone(zona_guayaquil)
+            # Parsear la fecha y hora directamente
+            fecha, hora = fecha_creacion.split("T")
+            hora = hora.split("-")[0]  # Eliminar la parte de la zona horaria si está presente
             return {
-                "fecha": fecha_local.strftime("%Y-%m-%d"),
-                "hora": fecha_local.strftime("%H:%M:%S.%f")  # Incluye microsegundos
+                "fecha": fecha,
+                "hora": hora
             }
         except Exception as e:
             print(f"Error parsing fecha_creacion: {e}")
