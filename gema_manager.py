@@ -37,6 +37,7 @@ class GemaManager:
             try:
                 self.connection = psycopg2.connect(**self.db_config)
                 print("PostgreSQL connection established successfully.")
+                self.upload_pending_palets()
                 break
             except Exception as e:
                 print(f"Failed to connect to PostgreSQL: {e}")
