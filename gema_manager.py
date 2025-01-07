@@ -37,6 +37,7 @@ class GemaManager:
             try:
                 self.connection = psycopg2.connect(**self.db_config)
                 print("PostgreSQL connection established successfully.")
+                self.upload_in_progress = False
                 self.upload_pending_palets()
                 break
             except Exception as e:
@@ -208,7 +209,14 @@ class GemaManager:
         except Exception as e:
             print(f"Error during palet upload: {e}")
         finally:
-            self.upload_in_progress = False
+            time.sleep(self.retry_interval)
+            try:
+                self.connection.close()
+                self._connect_to_database()
+            except Exception as e:
+                print(f"Error closing connection: {e}")
+                
+            
 
     def close_connection(self):
         """Cierra la conexión a la base de datos."""
