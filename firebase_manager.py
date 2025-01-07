@@ -56,10 +56,13 @@ class FirebaseManager:
 
                 for palet in pending_palets:
                     self._upload_single_palet(palet)
-                    time.sleep(1)  # Pausa breve entre subidas para evitar saturar la conexión
+                      # Pausa breve entre subidas para evitar saturar la conexión
 
             except Exception as e:
                 print(f"Error during upload process: {e}")
+            finally:
+                time.sleep(1)
+
 
             # Esperar antes de reintentar si no hay más palets pendientes
             # time.sleep(self.retry_interval)

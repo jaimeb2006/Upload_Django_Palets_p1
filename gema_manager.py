@@ -216,8 +216,6 @@ class GemaManager:
             except Exception as e:
                 print(f"Error closing connection: {e}")
                 
-            
-
     def close_connection(self):
         """Cierra la conexión a la base de datos."""
         if self.connection:
