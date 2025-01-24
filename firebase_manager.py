@@ -8,36 +8,54 @@ from django_manager import DjangoManager
 from palet import Palet
 
 class FirebaseManager:
-    def __init__(self, django_manager: DjangoManager, linea: str):
-        # cred = credentials.Certificate("./vitapro-40650.json")
+    def __init__(self, django_manager: DjangoManager, linea: str, retry_interval: int = 60):
+        # self.cred = credentials.Certificate("./vitapro-40650.json")
         # cred = credentials.Certificate("./vitaproapp.json")
-        cred = credentials.Certificate("C:/ProgramData/Inbalnor/vitaproapp.json")
+        self.cred = credentials.Certificate("C:/ProgramData/Inbalnor/vitaproapp.json")
         self.upload_in_progress = False
         self.django_manager = django_manager
         self.linea = linea
         # Bandera para controlar si una carga está en progreso
         # Intervalo de reintento en segundos
-        self.retry_interval = 60
-        
-        self.initialize_firebase(cred)
-        self.db = firestore.client()
+        self.retry_interval = retry_interval
+        self.db = None
+        self.is_initialized = False
+        self.initialize_firebase(self.cred)
         
 
 
     def initialize_firebase(self, cred):
-        while True:
-            try:
-                firebase_admin.initialize_app(cred)
-                print('Firebase initialized successfully')
-                self.set_palet_in_firebase()
-                break
-            except Exception as e:
-                print(f'Failed to initialize Firebase: {e}')
-                print('Retrying in 5 seconds...')
-                time.sleep(5)
+        time_retry_init = 5
+        if not self.django_manager.check_real_internet_connection():
+            print("No internet connection. Retrying in 5 seconds...")
+            self.schedule_function(self.initialize_firebase, time_retry_init, cred)
+            return
+        try:
+            firebase_admin.initialize_app(cred)
+            print('Firebase initialized successfully')
+            self.is_initialized = True
+            self.db = firestore.client()
+            self.set_palet_in_firebase()
+            
+        except Exception as e:
+            print(f'Failed to initialize Firebase: {e}')
+            print('Retrying in 5 seconds...')
+            self.schedule_function(self.initialize_firebase, time_retry_init, cred) 
+
+    def schedule_function(self, func, interval, *args, **kwargs):
+        """
+        Schedule a function to be called after a specific interval.
+        """
+        print(f"Scheduling function '{func.__name__}' to run in {interval} seconds...")
+        threading.Timer(interval, func, args=args, kwargs=kwargs).start()
 
     def set_palet_in_firebase(self):
         """Sube palets pendientes en lotes de 5 y evita nuevas subidas hasta que termine."""
+
+        if not self.is_initialized:
+            print("Firebase is not already initialized.")
+            return
+        
         if self.upload_in_progress:
             print("Upload already in progress. Please wait until it finishes.")
             return
@@ -47,27 +65,37 @@ class FirebaseManager:
 
     def _upload_pending_palets(self):
         """Busca los palets pendientes y los sube a Firebase en lotes de 5."""
-        while True:
-            try:
-                pending_palets = self.django_manager.get_palets_pendientes_mas_bajos(self.linea)
-                if not pending_palets:
-                    print("No more pending palets to upload.")
+        
+        try:
+            pending_palets = self.django_manager.get_palets_pendientes_mas_bajos(self.linea)
+            if not pending_palets:
+                print("No more pending palets to upload.")
+                self.upload_in_progress = False
+                return
+
+            time_retry_upload = 5
+            for palet in pending_palets:
+                if not self.django_manager.check_real_internet_connection():
+                    print("No internet connection. Retrying ...")
+                    self.upload_in_progress = False
+                    self.schedule_function(self.set_palet_in_firebase, time_retry_upload)
                     break
+                    
+                result_firebase = self._upload_single_palet(palet)
+                if not result_firebase:
+                    print("Failed to upload palet. Retrying ...")
+                    self.upload_in_progress = False
+                    self.schedule_function(self.set_palet_in_firebase, time_retry_upload)
+                    break
+                    # Pausa breve entre subidas para evitar saturar la conexión
 
-                for palet in pending_palets:
-                    self._upload_single_palet(palet)
-                      # Pausa breve entre subidas para evitar saturar la conexión
+        except Exception as e:
+            print(f"Error during upload process: {e}")
+            self.upload_in_progress = False
+            self.schedule_function(self.set_palet_in_firebase, time_retry_upload)
+        
+        self.upload_in_progress = False    
 
-            except Exception as e:
-                print(f"Error during upload process: {e}")
-            finally:
-                time.sleep(1)
-
-
-            # Esperar antes de reintentar si no hay más palets pendientes
-            # time.sleep(self.retry_interval)
-
-        self.upload_in_progress = False
 
     def _upload_single_palet(self, palet: Palet):
         """Sube un único palet a Firebase y actualiza su estado en Django."""
@@ -79,7 +107,9 @@ class FirebaseManager:
             
             # Actualiza el estado del palet en Django
             self.django_manager.update_palet_firebase(palet.id, ref[1].id)
-            print(f"Palet {palet.id} uploaded successfully with Firebase ID: {ref[1].id}")
+            print(f"Palet {palet.id} uploaded successfully with Firebase ID: {ref[1].id} sscc: {palet.sscc}")
+            return True
 
         except Exception as e:
             print(f"Failed to upload palet {palet.id}: {e}")
+            return False

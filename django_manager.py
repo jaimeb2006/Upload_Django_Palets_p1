@@ -1,3 +1,4 @@
+import socket
 import requests
 from orden_produccion import OrdenProduccion
 from requests.exceptions import ConnectionError, HTTPError
@@ -27,6 +28,15 @@ class DjangoManager:
         # Inicializar gestores
         
         # self.api_manager = ApiManager(BASE_URL, auth_manager)
+
+    def check_real_internet_connection(self):
+        """Check if there is an active internet connection."""
+        try:
+            # Intentar hacer ping a google.com
+            socket.create_connection(("google.com", 80), timeout=5)
+            return True
+        except OSError:
+            return False
 
 
     def _send_request(self, method, url, data=None, json=None, headers=None):

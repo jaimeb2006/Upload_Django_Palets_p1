@@ -63,15 +63,15 @@ class UtilidadGeneral:
         # Verificar si ya fue inicializado para evitar múltiples inicializaciones
         if hasattr(self, "initialized") and self.initialized:
             return
-        self.linea = 1
+        self.linea = 3
         self.is_run = False
         self.actualizar_productos_addresses =  "ns=2;s=Inbalnor_OPC.generales.p1_actualizar_productos"
         # Opc addresses subscription
         self.opc_addresses_subcription = {
             'job_trigger': f'ns=2;s=Inbalnor_OPC.generales.p1_l{self.linea}_job_trigger_terciaria',
-            'terciaria_counter1': f'ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.Counter1',
-            'terciaria_total_counter': f'ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.TotalCount',
             'terciaria_job_id': f"ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.CurrentProduct",
+            'terciaria_total_counter': f'ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.TotalCount',
+            'terciaria_counter1': f'ns=2;s=Printers_Inbalnor.p1_l{self.linea}_terciaria.Devices.p1_l{self.linea}_terciaria.Counter1',
             # 'terciaria_job_id': f'ns=2;s=Inbalnor_OPC.generales.p1_l{self.linea}_terciaria_CurrentProduct',
             # 'terciaria_total_counter': f'ns=2;s=Inbalnor_OPC.generales.p1_l{self.linea}_terciaria_TotalCount',
             # 'terciaria_counter1': f'ns=2;s=Inbalnor_OPC.generales.p1_l{self.linea}_terciaria_Counter1', 

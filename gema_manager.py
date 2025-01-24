@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 # Credenciales de PostgreSQL (constantes)
 DB_HOST = "34.138.202.114"
+# DB_HOST = "192.168.100.112"
 DB_PORT = 5432
 DB_NAME = "db-gema-matriz-dev"
 DB_USER = "user_colos"
@@ -16,7 +17,7 @@ DB_PASSWORD = "5zZh0uuECz0M"
 
 
 class GemaManager:
-    def __init__(self, django_manager: DjangoManager, linea: str, retry_interval: int = 60):
+    def __init__(self, django_manager: DjangoManager, linea: str, retry_interval: int = 5):
         self.db_config = {
             "host": DB_HOST,
             "port": DB_PORT,
@@ -27,23 +28,36 @@ class GemaManager:
         self.retry_interval = retry_interval
         self.upload_in_progress = False
         self.connection = None
+        self.is_initialized = False
         self.django_manager = django_manager
         self.linea = linea
+        self.upload_in_progress = False
         self._connect_to_database()
 
     def _connect_to_database(self):
         """Inicializa la conexión a la base de datos."""
-        while True:
-            try:
-                self.connection = psycopg2.connect(**self.db_config)
-                print("PostgreSQL connection established successfully.")
-                self.upload_in_progress = False
-                self.upload_pending_palets()
-                break
-            except Exception as e:
-                print(f"Failed to connect to PostgreSQL: {e}")
-                print(f"Retrying in {self.retry_interval} seconds...")
-                time.sleep(self.retry_interval)
+
+        if not self.django_manager.check_real_internet_connection():
+            print("No internet connection Gema. Retrying in 5 seconds...")
+            self.schedule_function(self._connect_to_database, self.retry_interval)
+            return
+        try:
+            self.connection = psycopg2.connect(**self.db_config)
+            print("PostgreSQL connection established successfully.")
+            self.is_initialized = True
+            self.upload_pending_palets()
+            
+        except Exception as e:
+            print(f"Failed to connect to PostgreSQL: {e}")
+            print(f"Retrying in {self.retry_interval} seconds...")
+            self.schedule_function(self._connect_to_database, self.retry_interval)
+
+    def schedule_function(self, func, interval, *args, **kwargs):
+        """
+        Schedule a function to be called after a specific interval.
+        """
+        print(f"Scheduling function '{func.__name__}' to run in {interval} seconds...")
+        threading.Timer(interval, func, args=args, kwargs=kwargs).start()
 
     def get_finished_product_data(self, sku_code: str, id_factory: int):
         """
@@ -147,6 +161,10 @@ class GemaManager:
 
 
     def upload_pending_palets(self):
+        if not self.is_initialized:
+            print("Gema is not already initialized.")
+            return
+        
         """Verifica y sube los palets con `subido_a_vitacontrol=False`."""
         if self.upload_in_progress:
             print("Upload already in progress. Please wait until it finishes.")
@@ -158,63 +176,75 @@ class GemaManager:
     def _process_pending_palets(self):
         """Sube los palets pendientes a PostgreSQL."""
         try:
-            while True:
-                pending_palets = self.django_manager.get_palets_pendientes_mas_bajos_gema(self.linea)
-                if not pending_palets:
-                    print("No more pending palets to upload.")
-                    break
+            pending_palets = self.django_manager.get_palets_pendientes_mas_bajos_gema(self.linea)
+            if not pending_palets:
+                print("No more pending palets to upload in Gema.")
+                self.upload_in_progress = False
+                return
+            
+            time_retry_upload = 5
+            for palet in pending_palets:
+                # Buscar `id_finished_product` por SKU e ID de fábrica
+                #Planta 1 = id = 2 y planta 2 = id = 3
 
-                for palet in pending_palets:
-                    # Buscar `id_finished_product` por SKU e ID de fábrica
-                    #Planta 1 = id = 2 y planta 2 = id = 3
-                    product_data = self.get_finished_product_data(palet.sku, 2)
+                if not self.django_manager.check_real_internet_connection():
+                    print("No internet Gema connection. Retrying ...")
+                    self.upload_in_progress = False
+                    self.schedule_function(self.upload_pending_palets, time_retry_upload)
+                    return
+
+                product_data = self.get_finished_product_data(palet.sku, 2)
+                if not product_data:
+                    # Si no existe, insertar un nuevo registro
+                    print(f"Inserting new finished product for SKU {palet.sku} and Factory ID {2}.")
+                    product_data = self.insert_finished_product(
+                        sku_code=palet.sku,
+                        finished_product_detail=palet.nombre_producto,
+                        id_factory=2
+                    )
                     if not product_data:
-                        # Si no existe, insertar un nuevo registro
-                        print(f"Inserting new finished product for SKU {palet.sku} and Factory ID {2}.")
-                        product_data = self.insert_finished_product(
-                            sku_code=palet.sku,
-                            finished_product_detail=palet.nombre_producto,
-                            id_factory=2
-                        )
-                        if not product_data:
-                            print(f"Skipping Palet {palet.id}: Unable to insert finished product.")
-                            continue
+                        print(f"Skipping Palet {palet.id}: Unable to insert finished product.")
+                        continue
 
-                    # Obtener fecha y hora local desde fecha_creacion
-                    fecha_hora = self.get_fecha_hora_local(palet.fecha_creacion)
+                # Obtener fecha y hora local desde fecha_creacion
+                fecha_hora = self.get_fecha_hora_local(palet.fecha_creacion)
 
-                    record = {
-                        "date": fecha_hora["fecha"],
-                        "time": fecha_hora["hora"],
-                        "id_packaging_line": palet.linea,
-                        "id_production_line": palet.prensa_numero,
-                        "id_finished_product": product_data["id_finished_product"],
-                        "batch": palet.lote_completo,
-                        "bags_quantity": palet.cantidad,
-                        "id_shift_report": None,
-                        "sscc": palet.sscc,
-                        "pallet_number": palet.numero_palet,
-                        "unit_of_measurement": 'UND'
-                    }
-                    result = self.insert_conforming_product_quantity(record)
-                    if result is None:
-                        print(f"Error inserting record for Palet {palet.id} marked as uploaded.")
-                    else:
-                        # Marca el palet como subido
-                        self.django_manager.update_palet_gema(palet.id, result)
-                        print(f"Palet {palet.id} marked as uploaded with Gema ID: {result}.")
-                    time.sleep(1)  # Pausa breve entre subidas para evitar saturar la conexión
+                record = {
+                    "date": fecha_hora["fecha"],
+                    "time": fecha_hora["hora"],
+                    "id_packaging_line": palet.linea,
+                    "id_production_line": palet.prensa_numero,
+                    "id_finished_product": product_data["id_finished_product"],
+                    "batch": palet.lote_completo,
+                    "bags_quantity": palet.cantidad,
+                    "id_shift_report": None,
+                    "sscc": palet.sscc,
+                    "pallet_number": palet.numero_palet,
+                    "unit_of_measurement": 'UND'
+                }
+                result = self.insert_conforming_product_quantity(record)
+                if result is None:
+                    print(f"Error inserting record for Palet {palet.id} marked as uploaded.")
+                else:
+                    # Marca el palet como subido
+                    self.django_manager.update_palet_gema(palet.id, result)
+                    print(f"Palet {palet.id} marked as uploaded with Gema ID: {result}.")
+                time.sleep(1)  # Pausa breve entre subidas para evitar saturar la conexión
 
                 # time.sleep(self.retry_interval)
+
+            self.upload_in_progress = False
+            self.upload_pending_palets()            
         except Exception as e:
-            print(f"Error during palet upload: {e}")
-        finally:
-            time.sleep(self.retry_interval)
             try:
+                self.is_initialized = False
+                self.upload_in_progress = False
                 self.connection.close()
-                self._connect_to_database()
             except Exception as e:
                 print(f"Error closing connection: {e}")
+            
+            self.schedule_function(self._connect_to_database, time_retry_upload)
+            
                 
     def close_connection(self):
         """Cierra la conexión a la base de datos."""
