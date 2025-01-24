@@ -73,28 +73,30 @@ class FirebaseManager:
                 self.upload_in_progress = False
                 return
 
-            time_retry_upload = 5
+            time_retry_upload = 30
             for palet in pending_palets:
                 if not self.django_manager.check_real_internet_connection():
                     print("No internet connection. Retrying ...")
                     self.upload_in_progress = False
                     self.schedule_function(self.set_palet_in_firebase, time_retry_upload)
-                    break
+                    return
                     
                 result_firebase = self._upload_single_palet(palet)
                 if not result_firebase:
                     print("Failed to upload palet. Retrying ...")
                     self.upload_in_progress = False
                     self.schedule_function(self.set_palet_in_firebase, time_retry_upload)
-                    break
+                    return
                     # Pausa breve entre subidas para evitar saturar la conexión
+            self.upload_in_progress = False    
+            self.set_palet_in_firebase()
 
         except Exception as e:
             print(f"Error during upload process: {e}")
             self.upload_in_progress = False
             self.schedule_function(self.set_palet_in_firebase, time_retry_upload)
         
-        self.upload_in_progress = False    
+        
 
 
     def _upload_single_palet(self, palet: Palet):

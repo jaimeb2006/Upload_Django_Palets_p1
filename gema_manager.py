@@ -182,7 +182,7 @@ class GemaManager:
                 self.upload_in_progress = False
                 return
             
-            time_retry_upload = 5
+            time_retry_upload = 30
             for palet in pending_palets:
                 # Buscar `id_finished_product` por SKU e ID de fábrica
                 #Planta 1 = id = 2 y planta 2 = id = 3
