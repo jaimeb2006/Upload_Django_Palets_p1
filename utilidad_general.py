@@ -63,7 +63,7 @@ class UtilidadGeneral:
         # Verificar si ya fue inicializado para evitar múltiples inicializaciones
         if hasattr(self, "initialized") and self.initialized:
             return
-        self.linea = 3
+        self.linea = 1
         self.is_run = False
         self.actualizar_productos_addresses =  "ns=2;s=Inbalnor_OPC.generales.p1_actualizar_productos"
         # Opc addresses subscription
