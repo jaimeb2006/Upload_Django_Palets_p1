@@ -157,6 +157,7 @@ class Palet:
             "planta": self.movimientos_nombre[0],
             "planta_linea": f'{self.movimientos_nombre[0]}_l{self.linea}',
             "id_last_session": f'produccion_{self.movimientos_nombre[0]}',
+            'fecha_lote_numeros': self.lote_completo[2:8]
         }
 
 
@@ -186,7 +187,7 @@ class Palet:
             fecha_elaboracion=orden_produccion.fecha_creacion,
             fecha_caducidad=fecha_caducidad,
             numero_palet=numero_actual,
-            fecha_creacion=orden_produccion.fecha_creacion,
+            fecha_creacion=datetime.now(),
             fecha_actualizacion=datetime.now(),
             id_bodega_origen=0,
             id_bodega_destino=0,
